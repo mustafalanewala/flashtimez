@@ -9,7 +9,9 @@ import { formatDate, getImageUrl, getExcerpt } from "@/lib/news-utils";
 import { Cpu, ArrowRight, Clock, TrendingUp } from "lucide-react";
 
 export default function TechNews() {
-  const { data: news, isLoading } = useSWR("/api/news", fetcher);
+  const { data, isLoading } = useSWR("/api/news", fetcher);
+
+  const news = data?.data?.news || [];
 
   if (isLoading) {
     return (

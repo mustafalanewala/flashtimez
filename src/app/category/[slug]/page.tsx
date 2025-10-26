@@ -25,7 +25,7 @@ export default function CategoryPage({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  const { data, error, isLoading } = useSWR<NewsItem[]>("/api/news", fetcher);
+  const { data, error, isLoading } = useSWR("/api/news", fetcher);
 
   if (isLoading) {
     return (
@@ -48,8 +48,9 @@ export default function CategoryPage({
     );
   }
 
-  const categoryName = getCategoryFromSlug(data, slug);
-  const categoryNews = filterByCategory(data, slug);
+  const newsData = data?.data?.news || [];
+  const categoryName = getCategoryFromSlug(newsData, slug);
+  const categoryNews = filterByCategory(newsData, slug);
   const paginatedNews = paginateItems(categoryNews, currentPage, itemsPerPage);
 
   if (categoryNews.length === 0) {
@@ -151,7 +152,7 @@ export default function CategoryPage({
         {/* Articles Grid */}
         {paginatedNews.items.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedNews.items.map((article) => (
+            {paginatedNews.items.map((article: NewsItem) => (
               <div
                 key={article.news_Id}
                 className="group bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-1 border border-gray-700"

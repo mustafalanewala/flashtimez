@@ -9,7 +9,9 @@ import { NewsItem } from "@/lib/types";
 import { Clock, ArrowRight, Flame } from "lucide-react";
 
 export default function FeaturedNews() {
-  const { data: news, isLoading } = useSWR("/api/news", fetcher);
+  const { data, isLoading } = useSWR("/api/news", fetcher);
+
+  const news = data?.data?.news || [];
 
   if (isLoading) {
     return (

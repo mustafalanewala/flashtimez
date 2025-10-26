@@ -10,11 +10,11 @@ import { NewsItem } from "@/lib/types";
 import { ChevronLeft, ChevronRight, Play, Clock, User } from "lucide-react";
 
 export default function HeroSection() {
-  const { data: news, isLoading } = useSWR("/api/news", fetcher);
+  const { data, isLoading } = useSWR("/api/news", fetcher);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Get featured news (first 5 articles)
-  const featuredNews: NewsItem[] = news?.slice(0, 5) || [];
+  const featuredNews: NewsItem[] = data?.data?.news?.slice(0, 5) || [];
 
   // Auto-advance slides
   useEffect(() => {

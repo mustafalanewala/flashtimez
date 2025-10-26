@@ -17,7 +17,7 @@ export default function NewsDetailPage({
 }) {
   const { slug } = use(params);
 
-  const { data, error, isLoading } = useSWR<NewsItem[]>("/api/news", fetcher);
+  const { data, error, isLoading } = useSWR("/api/news", fetcher);
 
   if (isLoading) {
     return (
@@ -40,15 +40,16 @@ export default function NewsDetailPage({
     );
   }
 
-  const newsItem = data.find((item) => item.slug === slug);
+  const newsData = data?.data?.news || [];
+  const newsItem = newsData.find((item: NewsItem) => item.slug === slug);
 
   if (!newsItem) {
     notFound();
   }
 
-  const relatedNews = data
+  const relatedNews = newsData
     .filter(
-      (item) =>
+      (item: NewsItem) =>
         item.categrory_Name === newsItem.categrory_Name &&
         item.news_Id !== newsItem.news_Id
     )
@@ -248,7 +249,7 @@ export default function NewsDetailPage({
                   Related Stories
                 </h3>
                 <div className="space-y-4">
-                  {relatedNews.map((item) => (
+                  {relatedNews.map((item: NewsItem) => (
                     <Link
                       key={item.news_Id}
                       href={`/news/${item.slug}`}
@@ -287,15 +288,15 @@ export default function NewsDetailPage({
                 Popular Articles
               </h3>
               <div className="space-y-4">
-                {data
-                  .filter((item) => item.news_Id !== newsItem.news_Id)
+                {newsData
+                  .filter((item: NewsItem) => item.news_Id !== newsItem.news_Id)
                   .sort(
-                    (a, b) =>
+                    (a: NewsItem, b: NewsItem) =>
                       new Date(b.insert_Date).getTime() -
                       new Date(a.insert_Date).getTime()
                   )
                   .slice(0, 5)
-                  .map((item) => (
+                  .map((item: NewsItem) => (
                     <Link
                       key={item.news_Id}
                       href={`/news/${item.slug}`}

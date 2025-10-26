@@ -20,7 +20,7 @@ import {
 
 export default function Navbar() {
   const { data, isLoading } = useSWR("/api/news", fetcher);
-  const categories = getCategories(data || []);
+  const categories = getCategories(data?.data?.news || []);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const featuredCategories = categories.slice(0, 6);
+  const featuredCategories = categories.slice(0, 4);
   const allCategories = categories;
 
   const currentTime = new Date().toLocaleTimeString("en-US", {
@@ -155,6 +155,27 @@ export default function Navbar() {
                 Home
               </Link>
 
+              <Link
+                href="/blog"
+                className="flex items-center gap-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors group"
+              >
+                Blog
+              </Link>
+
+              <Link
+                href="/video"
+                className="flex items-center gap-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors group"
+              >
+                Video
+              </Link>
+
+              <Link
+                href="/gallery"
+                className="flex items-center gap-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors group"
+              >
+                Gallery
+              </Link>
+
               {featuredCategories.map((category) => (
                 <Link
                   key={category}
@@ -181,26 +202,26 @@ export default function Navbar() {
                   <div
                     onMouseEnter={() => setIsCategoriesOpen(true)}
                     onMouseLeave={() => setIsCategoriesOpen(false)}
-                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-flash-light py-6 z-50"
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-flash-light py-3 z-50"
                   >
-                    <div className="px-6 mb-4">
-                      <h3 className="font-headline font-semibold text-flash-secondary mb-2">
+                    <div className="px-3 mb-1">
+                      <h3 className="font-headline font-semibold text-flash-secondary mb-1">
                         All Categories
                       </h3>
-                      <p className="text-sm text-flash-muted">
+                      <p className="text-xs text-flash-muted">
                         Explore news by topic
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 px-6">
+                    <div className="grid grid-cols-3 gap-0.5 px-3">
                       {allCategories.map((category) => (
                         <Link
                           key={category}
                           href={`/category/${slugifyCategory(category)}`}
-                          className="p-3 rounded-lg hover:bg-flash-secondary/5 transition-colors group"
+                          className="p-1.5 rounded-lg hover:bg-flash-secondary/5 transition-colors group"
                           onClick={() => setIsCategoriesOpen(false)}
                         >
-                          <span className="text-sm font-medium text-flash-secondary group-hover:text-flash-primary transition-colors">
+                          <span className="text-xs font-medium text-flash-secondary group-hover:text-flash-primary transition-colors">
                             {category}
                           </span>
                         </Link>
@@ -228,6 +249,30 @@ export default function Navbar() {
                 >
                   <TrendingUp className="h-5 w-5" />
                   Home
+                </Link>
+
+                <Link
+                  href="/blog"
+                  className="flex items-center gap-3 py-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+
+                <Link
+                  href="/video"
+                  className="flex items-center gap-3 py-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Video
+                </Link>
+
+                <Link
+                  href="/gallery"
+                  className="flex items-center gap-3 py-2 font-semibold text-flash-secondary hover:text-flash-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Gallery
                 </Link>
 
                 {allCategories.map((category) => (

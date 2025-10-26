@@ -1,14 +1,26 @@
 export const fetcher = async (url?: string) => {
-  // If no URL provided, use our internal API route that proxies the real news API
-  const apiUrl = url || "/api/news"
+  const externalApi = "https://newsapi.timesmed.com/WebAPI/getnewslist?siteId=9&language=English"
+
+  let apiUrl: string
+  const isServer = typeof window === "undefined"
+
+  if (url) {
+    if (url === "/api/news") {
+      apiUrl = isServer ? externalApi : "/api/news"
+    } else {
+      apiUrl = url
+    }
+  } else {
+    apiUrl = isServer ? externalApi : "/api/news"
+  }
 
   try {
     const res = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
     })
 
     if (!res.ok) {
@@ -17,47 +29,24 @@ export const fetcher = async (url?: string) => {
 
     const data = await res.json()
 
-    // If using our internal API route, the data should already be transformed
+    // If caller requested the internal proxy `/api/news`, return the full data object
+    if (url === "/api/news") {
+      if (data?.data) return data
+      if (data.news) return { data: { news: data.news } }
+      return { data: { news: [] } }
+    }
+
     if (!url) {
-      // Handle different possible response structures
-      if (Array.isArray(data)) {
-        return data
-      } else if (data.data?.news && Array.isArray(data.data.news)) {
-        return data.data.news
-      } else if (data.news && Array.isArray(data.news)) {
-        return data.news
-      } else {
-        console.warn('Unexpected API response structure:', data)
-        return []
-      }
+      if (data?.data?.news && Array.isArray(data.data.news)) return data.data
+      if (Array.isArray(data)) return { news: data }
+      if (data.news && Array.isArray(data.news)) return { news: data.news }
+
+      return data
     }
 
     return data
   } catch (error) {
-    console.error('API fetch error:', error)
-    // Fallback to static data if API fails
-    try {
-      const fallbackRes = await fetch('/data/data.json', { cache: "no-store" })
-      if (!fallbackRes.ok) throw new Error("Fallback data fetch failed")
-      const fallbackData = await fallbackRes.json()
-
-      // Transform static data to match API field names (camelCase)
-      return fallbackData.map((item: any) => ({
-        news_Id: item.News_Id || item.news_Id,
-        news_Title: item.News_Title || item.news_Title,
-        news_Content: item.News_Content || item.news_Content,
-        image: item.Image || item.image,
-        insert_Date: item.Insert_Date || item.insert_Date,
-        news_Source: item.News_Source || item.news_Source,
-        categrory_Name: item.Categrory_Name || item.categrory_Name,
-        slug: item.Slug || item.slug,
-        category_Id: item.category_Id,
-        type_Id: item.type_Id,
-        type_Name: item.type_Name
-      }))
-    } catch (fallbackError) {
-      console.error('Fallback data fetch also failed:', fallbackError)
-      return []
-    }
+    console.error("API fetch error:", error)
+    return { news: [], blogs: [], videos: [], galleries: [] }
   }
 }
